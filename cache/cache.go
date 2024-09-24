@@ -163,3 +163,81 @@ func (c *Cache) Keys() []string {
 
 	return keys
 }
+
+// returns a slice of all values in the cache.
+func (c *Cache) Values() []interface{} {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	values := make([]interface{}, 0, c.lruList.Len())
+	for elem := c.lruList.Front(); elem != nil; elem = elem.Next() {
+		values = append(values, elem.Value.(*entry).value)
+	}
+
+	return values
+}
+
+// return the time-to-love for the cache
+func (c *Cache) TTL() time.Duration {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return c.ttl
+}
+
+// updates the ttl for a key
+func (c *Cache) UpdateTTL(key string, ttl time.Duration) {
+	c.mu.RLock()
+	defer c.mu.Unlock()
+
+	if elem, ok := c.cache[key]; ok {
+		elem.Value.(*entry).ttl = time.Now().Add(ttl)
+	}
+}
+
+// checks if a key exists in the cache
+func (c *Cache) CheckExists(key string) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	_, ok := c.cache[key]
+	return ok
+}
+
+// returns the expiration time for a key
+func (c *Cache) GetExpirationTime(key string) (time.Time, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	elem, ok := c.cache[key]
+	if !ok {
+		return time.Time{}, false
+	}
+
+	return elem.Value.(*entry).ttl, true
+}
+
+func (c *Cache) DeleteBefore(t time.Time) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	for _, elem := range c.cache {
+		if elem.Value.(*entry).ttl.Before(t) {
+			c.remove(elem.Value.(*entry).key)
+		}
+	}
+}
+
+func (c *Cache) DeleteAfter(t time.Time) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for _, elem := range c.cache {
+		if elem.Value.(*entry).ttl.After(t) {
+			c.remove(elem.Value.(*entry).key)
+		}
+	}
+}
+
+// returns cache statistics
+func (c *Cache) Stats() (int, int, int) {
+
+}
