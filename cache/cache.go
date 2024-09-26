@@ -239,5 +239,30 @@ func (c *Cache) DeleteAfter(t time.Time) {
 
 // returns cache statistics
 func (c *Cache) Stats() (int, int, int) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
+	hits := 0
+	misses := 0
+	expired := 0
+
+	for _, elem := range c.cache {
+		if elem.Value.(*entry).ttl.Before(time.Now()) {
+			expired ++
+		} else if elem.Value.(*entry).ttl.After(time.Now()){
+			hits ++
+		} else {
+			misses ++
+		}
+	}
+
+	return hits, misses, expired
+}
+
+func NewEntry(key string, value interface{}, ttl time.Duration) *entry {
+	return &entry {
+		key : key,
+		value : value,
+		ttl : time.Now().Add(ttl),
+	}
 }
