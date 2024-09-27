@@ -5,12 +5,19 @@ const Navbar = () => {
         <span className="text-xl font-bold font-mono">⏱️TimeCache</span>
       </div>
 
-      <div>
+      <div className="flex gap-4">
         <a
           href="https://github.com/mrinalxdev/time-cache"
           className="hover:underline hover:underline-offset-4 duration-100 cursor-pointer"
         >
           Github
+        </a>
+
+        <a
+          href="https://github.com/mrinalxdev/time-cache"
+          className="hover:underline hover:underline-offset-4 duration-100 cursor-pointer"
+        >
+          Lists of Projects
         </a>
       </div>
     </div>

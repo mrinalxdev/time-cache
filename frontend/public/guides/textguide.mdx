@@ -1,0 +1,91 @@
+## 1. Installation 
+
+Get the specefic directory of cache into your !!
+```bash
+git clone github.com/mrinalxdev/time-cache.git
+
+cd time-cache
+
+rm -rf frontend
+
+go mod tidy
+```
+
+## 2. Basic Usage 
+```go
+//main file
+import (
+    "time"
+)
+// Create a new cache with a 5-minute TTL
+cache := timecache.NewCache(5*time.Minute, nil)
+
+// Set a value
+cache.Set("key", "value")
+
+// Get a value
+value, found := cache.Get("key")
+
+// Remove a value
+cache.Remove("key")
+```
+
+### Lets use this in an E-commerce Backend app
+
+#### 1. Setting Up the TimeCache
+
+```go
+productCache := timecache.NewCache(15*time.Minute, 
+func(key string, value interface{}) 
+{
+    fmt.Printf("Product %s removed from cache\n", key)
+})
+```
+This creates a cache with a 15-minute TTL and a callback function that logs when items are removed
+
+#### 2. Define the Sturcture 
+```go
+type Product struct {
+    ID    string
+    Name  string
+    Price float64
+}
+```
+
+#### 3. Implement Caching Logic
+```go
+func getProduct(id string) (Product, bool) {
+    // Try to get the product from cache
+    if cachedProduct, found := productCache.Get(id); found {
+        return cachedProduct.(Product), true
+    }
+
+    // If not in cache, fetch from database
+    if product, exists := fetchProductFromDB(id); exists {
+        // Add to cache for future requests
+        productCache.Set(id, product)
+        return product, true
+    }
+
+    return Product{}, false
+}
+```
+#### 4. Use the Cache in Your Application
+```go
+productIDs := []string{"P001", "P002", "P003", "P001", "P004"}
+for _, id := range productIDs {
+    if product, found := getProduct(id); found {
+        fmt.Printf("Retrieved product: %+v\n", product)
+    } else {
+        fmt.Printf("Product %s not found\n", id)
+    }
+}
+```
+
+Some addtional features are __Cache Stats__ which is builtin to monitor your cache performance 
+Here is a quick guide how to implement it 
+
+```go
+hits, misses, expired := productCache.Stats()
+fmt.Printf("Cache stats - Hits: %d, Misses: %d, Expired: %d\n", hits, misses, expired)
+```

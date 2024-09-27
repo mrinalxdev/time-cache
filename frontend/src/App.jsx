@@ -1,3 +1,4 @@
+import Guide from "./components/Guide";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -23,7 +24,33 @@ function App() {
         </p>
       </section>
 
-      <section className="max-w-6xl mx-auto mt-[2rem] px-3">1. Installation</section>
+      <section className="max-w-7xl mx-auto mt-[2rem] px-3">
+        <Guide guideName="textguide" />
+      </section>
+
+      <section className="max-w-3xl mx-auto mt-[2rem] px-3 mb-4">
+        <h1 className="text-4xl font-semibold my-2">Liked the project !!</h1>
+
+        <p>
+          Give it a star in github !!{" "}
+          <a
+            href="github.com/mrinalxdev/time-cache"
+            className="underline underline-offset-4 text-blue-500 hover:text-blue-700 curosru-pointer"
+          >
+            Github
+          </a>
+        </p>
+
+        <p className="text-center my-[2rem]">
+          Made with ❤️ by{" "}
+          <a
+            href="https://github.com/mrinalxdev"
+            className="underline underline-offset-4 text-center"
+          >
+            Mrinal Pramanick
+          </a>{" "}
+        </p>
+      </section>
     </>
   );
 }
